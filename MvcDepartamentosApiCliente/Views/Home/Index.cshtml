@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@section Scripts{ 
+    <script>
+        var urlApi = "https://apidepartamentoscrud2022tajamar.azurewebsites.net/";
+        $(document).ready(function () {
+            cargarDepartamentos();
+            $("#botoninsert").click(function () {
+                var id = $("#cajanumero").val();
+                var nombre = $("#cajanombre").val();
+                var localidad = $("#cajalocalidad").val();
+                var departamento = new Object();
+                departamento.idDepartamento = parseInt(id);
+                departamento.nombre = nombre;
+                departamento.localidad = localidad;
+                //EL SERVICIO RECIBE JSON, CONVERTIMOS EL OBJETO 
+                //A JSON
+                var json = JSON.stringify(departamento);
+                var request = "/api/departamentos";
+                $.ajax({
+                    url: urlApi + request
+                    , type: "POST"
+                    , data: json
+                    , contentType: "application/json"
+                    , success: function () {
+                        cargarDepartamentos();
+                    }
+                });
+            });
+
+            $("#botonupdate").click(function () {
+                var id = parseInt($("#cajanumero").val());
+                var nombre = $("#cajanombre").val();
+                var localidad = $("#cajalocalidad").val();
+                var departamento = new Object();
+                departamento.idDepartamento = id;
+                departamento.nombre = nombre;
+                departamento.localidad = localidad;
+                var json = JSON.stringify(departamento);
+                var request = "/api/departamentos";
+                $.ajax({
+                    url: urlApi + request
+                    , type: "PUT"
+                    , data: json
+                    , contentType: "application/json"
+                    , success: function () {
+                        cargarDepartamentos();
+                    }
+                });
+            });
+
+            $("#botondelete").click(function () {
+                var id = $("#cajanumero").val();
+                var request = "/api/departamentos/" + id;
+                $.ajax({
+                    url: urlApi + request
+                    , type: "DELETE"
+                    , success: function () {
+                        cargarDepartamentos();
+                    }
+                });
+            });
+        });
+
+        function cargarDepartamentos() {
+            var request = "/api/departamentos";
+            $.ajax({
+                url: urlApi + request
+                , method: "GET"
+                , dataType: "json"
+                , success: function (data) {
+                    var html = "";
+                    $.each(data, function (index, departamento) {
+                        html += "<tr>";
+                        html += "<td>" + departamento.idDepartamento + "</td>";
+                        html += "<td>" + departamento.nombre + "</td>";
+                        html += "<td>" + departamento.localidad + "</td>";
+                        html += "</tr>";
+                    });
+                    $("#tablaDepartamentos tbody").html(html);
+                }
+            });
+        }
+    </script>
+}
+
+<div class="text-center">
+    <h1 class="display-4">Api CRUD Departamentos Cliente</h1>
+    <label>Número: </label>
+    <input type="text" id="cajanumero" class="form-control"/>
+    <br/>
+    <label>Nombre: </label>
+    <input type="text" id="cajanombre" class="form-control"/>
+    <br/>
+    <label>Localidad: </label>
+    <input type="text" id="cajalocalidad" class="form-control"/>
+    <br/>
+    <button id="botoninsert" class="btn btn-success">Insert</button>
+    <button id="botonupdate" class="btn btn-info">Update</button>
+    <button id="botondelete" class="btn btn-danger">Delete</button>
+    <hr/>
+    <table class="table table-warning" id="tablaDepartamentos">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Localidad</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
